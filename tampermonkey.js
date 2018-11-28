@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Happychat Coverage & Reports
 // @namespace    http://tampermonkey.net/
-// @version      0.81
+// @version      0.7
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
@@ -80,18 +80,18 @@ function getCoverage() {
 
     });
 
-    var aS = parseInt(aSr) * 5;
-    var cS = parseInt(cSr) * 5;
+    var aS = parseInt(aSr) * 5; // Available slots (green)
+    var cS = parseInt(cSr) * 5; // Current chats (green)
     var oS = parseInt(oSr)* 5;
-    var aSb = parseInt(aSrb) * 5;
-    var cSb = parseInt(cSrb) * 5;
+    var aSb = parseInt(aSrb) * 5; // Available slots (blue)
+    var cSb = parseInt(cSrb) * 5; // Current chats (blue)
     var oSb = parseInt(oSrb)* 5;
     if ((aS) && (cS)) {
         var morechat = "";
-        if (cS >= aS) {
+        if ((cS + cSb) >= (aS + aSb)) {
             morechat = "morechat";
         }
-        var thisTime = "   <td class='hour-"+curHour+" min-"+curMin+"'><div class='av'><img class='a' style='height:"+aSb+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'><img class='a' style='height:"+aS+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'></div><div class='cc'><img class='c "+morechat+"' style='height:"+cSb+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'><img class='c "+morechat+"' style='height:"+cS+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'></td>\n";
+        var thisTime = "   <td class='hour-"+curHour+" min-"+curMin+"'><div class='av'><img class='a' style='height:"+aSb+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'><img class='a' style='height:"+aS+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'></div><div class='cc "+morechat+"'><img class='c "+morechat+"' style='height:"+cSb+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'><img class='c "+morechat+"' style='height:"+cS+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'></td>\n";
         appendToStorage("report-"+curMonth+"-"+curDay, thisTime);
     }
 }
@@ -120,7 +120,7 @@ $('body').on('click', '#hc-reports .button-get', function() {
     var minutes = $('body.reports .data table td').length;
     $('body.reports .data table').css('width',minutes+'px');
     if($('.checkboxes').length < 1) {
-        $('#hc-reports').append('<div class="checkboxes"><input type="checkbox" id="avail-slots" name="avail-slots" checked><label for="avail-slots">Available slots (total throttle)</label><input type="checkbox" id="filled-slots" name="filled-slots" checked><label for="filled-slots">Current chats</label><input type="checkbox" id="sh-green" name="sh-green" checked><label for="sh-green">Chats/slots of green HEs</label><input type="checkbox" id="sh-blue" name="sh-blue" checked><label for="sh-blue">Chats/slots of blue HEs</label><input type="checkbox" id="morechats" name="morechats"><label for="morechats">Highlight morechat (all green HEs are filled up)</label></div>');
+        $('#hc-reports').append('<div class="checkboxes"><input type="checkbox" id="avail-slots" name="avail-slots" checked><label for="avail-slots">Available slots (total throttle)</label><input type="checkbox" id="filled-slots" name="filled-slots" checked><label for="filled-slots">Current chats</label><input type="checkbox" id="sh-green" name="sh-green" checked><label for="sh-green">Chats/slots of green HEs</label><input type="checkbox" id="sh-blue" name="sh-blue" checked><label for="sh-blue">Chats/slots of blue HEs</label><input type="checkbox" id="morechats" name="morechats"><label for="morechats">Highlight morechat (all green/blue HEs are filled up)</label></div>');
         $('#hc-reports').append('<div class="zooms"><a href="#" class="zoom-in">Zoom in</a> <a href="#" class="zoom-out">Zoom out</a> <a href="#" class="zoom-reset">Reset</a></div>');
     }
     $('.morechat').addClass('morechat-hide');
@@ -182,6 +182,3 @@ $('body').on('click', '#close-reports', function() {
     $('#hc-reports, #close-reports').fadeOut(200);
     $('#open-reports').fadeToggle(200);
 });
-
-
-
