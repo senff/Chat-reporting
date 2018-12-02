@@ -15,7 +15,7 @@ Now let it just sit there for a bit and do other stuff.
 
 You should see a blue circle at the top of your chat window.  When you select that, it will open the reporting tool.
 
-In the textfield, enter the date of the data you want to see (so for today, select “11-28”).  You should then see the report for that day, or at least the data you’ve collected so far.
+In the textfield, enter the date of the data you want to see (so for November 28, select “11-28”).  You should then see the report for that day, or at least the data you’ve collected so far.
 
 I think it all speaks for itself, but just to make sure:
 - light grey = total throttle of all green HEs
