@@ -26,9 +26,9 @@ I think it all speaks for itself, but just to make sure:
 
 If you hover your mouse over anywhere, it will show you the time (UTC), chats/thottle of greens, and chat/throttle of blues.
 
-For example, 13:19 47/50 (3/12) means:
-- 47 chats are going on while green HEs have a total throttle/availability of 50
-- 3 chats are going on while blue HEs have a total throttle/availabilty of 12 (edited)
+For example, 13:19 44/50 (3/12) means:
+- 44 chats are going on while green HEs have a total throttle/availability of 50 (so, 6 slots available)
+- 3 chats are going on while blue HEs have a total throttle/availabilty of 12 (so, 9 slots available)
 
 **STUFF THAT’S NOT WORKING**
 
