@@ -1,3 +1,11 @@
+**WHAT DOES IT DO?**
+
+With this script running in Happychat, availability and coverage is being logged and recorded on a minute-by-minute basis.
+By selecting the blue circle at the top right of the Happychat window, you can select a date to show a graph of that day, that visualizes how much coverage we had, and how much availability.
+
+Example: http://www.senff.com/chat-reporting/example.png
+
+
 **INSTALL THIS STUFF**
 
 1. Install the JavaScript with Tampermonkey and the CSS with Stylus
@@ -15,7 +23,7 @@ Now let it just sit there for a bit and do other stuff.
 
 You should see a blue circle at the top of your chat window.  When you select that, it will open the reporting tool.
 
-In the textfield, enter the date of the data you want to see (so for November 28, select “11-28”).  You should then see the report for that day, or at least the data you’ve collected so far.
+In the textfield, enter the date of the data you want to see (so for June 23, select “6-23”).  You should then see the report for that day, or at least the data you’ve collected so far.
 
 I think it all speaks for itself, but just to make sure:
 - light grey = total throttle of all green HEs
