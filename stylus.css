@@ -38,7 +38,7 @@
 #hc-reports .data table td.min-00:before {
     content:"";
     width: 1px;
-    height: 400px;
+    height: 550px;
     display: block;
     border-left: dashed 1px #555;
     z-index:25;
