@@ -3,7 +3,7 @@
 With this script running in Happychat, availability and coverage is being logged and recorded on a minute-by-minute basis.
 By selecting the blue circle at the top right of the Happychat window, you can select a date to show a graph of that day, that visualizes how much coverage we had, and how much availability.
 
-Example: http://www.senff.com/chat-reporting/example.png
+Example: http://www.senff.com/happychat/example.png
 
 
 **INSTALL THIS STUFF**
