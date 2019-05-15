@@ -95,7 +95,7 @@
 #hc-reports .data table td:hover:after {
     content:"";
     width: 1px;
-    height: 400px;
+    height: 550px;
     display: block;
     background: black;
     z-index:10;
