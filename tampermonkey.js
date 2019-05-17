@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Happychat Coverage & Reports
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      0.9
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
@@ -98,7 +98,7 @@ function getCoverage() {
 }
 
 function addToDateList(theDay) {
-    var dateOptions = '';
+    var dateOptions = '<option value="date">SELECT DATE</option>';
     var availableDates = [];
     for (var i = 0; i < localStorage.length; i++) {
         var key = localStorage.key(i);
@@ -135,32 +135,36 @@ $(document).ready(function() {
 
 $('body').on('click', '#hc-reports .button-delete', function() {
     var reportdate = $('#selReports').val();
-    var txt;
-    var delReport = confirm("This will remove the report for "+reportdate+".");
-    if (delReport == true) {
-        localStorage.removeItem("report-"+reportdate);
-        alert("Report for "+ reportdate +" has been deleted.");
-        var elementToRemove = 'option[value='+reportdate+']';
-        $(elementToRemove).remove();
+    if(reportdate != "date") {
+        var delReport = confirm("This will remove the report for "+reportdate+".");
+        if (delReport == true) {
+            localStorage.removeItem("report-"+reportdate);
+            alert("Report for "+ reportdate +" has been deleted.");
+            var elementToRemove = 'option[value='+reportdate+']';
+            $(elementToRemove).remove();
+            $('#hc-reports .data table.report-'+reportdate).remove();
+        }
     }
 });
 
 $('body').on('click', '#hc-reports .button-get', function() {
     var reportdate = $('#selReports').val();
-    var theData = localStorage.getItem("report-"+reportdate);
-    var reports = '<div class="line-100 line-hor"></div><div class="y-100">100</div><div class="line-75 line-hor"></div><div class="y-75">75</div><div class="line-50 line-hor"></div><div class="y-50">50</div><div class="line-25 line-hor"></div><div class="y-25">25</div><table>'+theData+'</tr></table>';
-    $('.data').html(reports);
-    var minutes = $('body.reports .data table td').length;
-    $('body.reports .data table').css('width',minutes+'px');
-    if($('.checkboxes').length < 1) {
-        $('#hc-reports').append('<div class="checkboxes"><input type="checkbox" id="avail-slots" name="avail-slots" checked><label for="avail-slots">Available slots (total throttle)</label><input type="checkbox" id="filled-slots" name="filled-slots" checked><label for="filled-slots">Current chats</label><input type="checkbox" id="sh-green" name="sh-green" checked><label for="sh-green">Chats/slots of green HEs</label><input type="checkbox" id="sh-blue" name="sh-blue" checked><label for="sh-blue">Chats/slots of blue HEs</label><input type="checkbox" id="morechats" name="morechats"><label for="morechats">Highlight morechat (all green/blue HEs are filled up)</label></div>');
-        $('#hc-reports').append('<div class="zooms"><a href="#" class="zoom-in">Zoom in</a> <a href="#" class="zoom-out">Zoom out</a> <a href="#" class="zoom-reset">Reset</a></div>');
+    if(reportdate != "date") {
+        var theData = localStorage.getItem("report-"+reportdate);
+        var reports = '<div class="line-100 line-hor"></div><div class="y-100">100</div><div class="line-75 line-hor"></div><div class="y-75">75</div><div class="line-50 line-hor"></div><div class="y-50">50</div><div class="line-25 line-hor"></div><div class="y-25">25</div><table class="report-'+reportdate+'">'+theData+'</tr></table>';
+        $('.data').html(reports);
+        var minutes = $('body.reports .data table td').length;
+        $('body.reports .data table').css('width',minutes+'px');
+        if($('.checkboxes').length < 1) {
+            $('#hc-reports').append('<div class="checkboxes"><input type="checkbox" id="avail-slots" name="avail-slots" checked><label for="avail-slots">Available slots (total throttle)</label><input type="checkbox" id="filled-slots" name="filled-slots" checked><label for="filled-slots">Current chats</label><input type="checkbox" id="sh-green" name="sh-green" checked><label for="sh-green">Chats/slots of green HEs</label><input type="checkbox" id="sh-blue" name="sh-blue" checked><label for="sh-blue">Chats/slots of blue HEs</label><input type="checkbox" id="morechats" name="morechats"><label for="morechats">Highlight morechat (all green/blue HEs are filled up)</label></div>');
+            $('#hc-reports').append('<div class="zooms"><a href="#" class="zoom-in">Zoom in</a> <a href="#" class="zoom-out">Zoom out</a> <a href="#" class="zoom-reset">Reset</a></div>');
+        }
+        $('.morechat').addClass('morechat-hide');
+        $('input[type="checkbox"]').prop('checked', true);
+        $('input#morechats').prop('checked', false);
+        var tableWidth = $('#hc-reports table').width();
+        $('#hc-reports .data .line-hor').css('width',(tableWidth)+'px');
     }
-    $('.morechat').addClass('morechat-hide');
-    $('input[type="checkbox"]').prop('checked', true);
-    $('input#morechats').prop('checked', false);
-    var tableWidth = $('#hc-reports table').width();
-    $('#hc-reports .data .line-hor').css('width',(tableWidth)+'px');
 });
 
 $(document).on('change', '#avail-slots', function() {
