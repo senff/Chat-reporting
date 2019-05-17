@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Happychat Coverage & Reports
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      0.91
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
@@ -224,3 +224,6 @@ $('body').on('click', '#close-reports', function() {
     $('#hc-reports, #close-reports').fadeOut(200);
     $('#open-reports').fadeToggle(200);
 });
+
+
+
