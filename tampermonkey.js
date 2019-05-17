@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Happychat Coverage & Reports
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.8
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
@@ -94,6 +94,27 @@ function getCoverage() {
         var thisTime = "   <td class='hour-"+curHour+" min-"+curMin+"'><div class='av'><img class='a' style='height:"+aSb+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'><img class='a' style='height:"+aS+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'></div><div class='cc "+morechat+"'><img class='c "+morechat+"' style='height:"+cSb+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'><img class='c "+morechat+"' style='height:"+cS+"px;' src='http://senff.com/x.png' title='"+curHour+":"+curMin+" - "+cSr+"/"+aSr+" ("+cSrb+"/"+aSrb+")'></td>\n";
         appendToStorage("report-"+curMonth+"-"+curDay, thisTime);
     }
+    addToDateList(curMonth+"-"+curDay);
+}
+
+function addToDateList(theDay) {
+    var dateOptions = '';
+    var availableDates = [];
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        var isReport = key.startsWith('report-');
+        if (isReport) {
+            var thisDate = key.substring(7);
+            availableDates.push(thisDate);
+        }
+    }
+    availableDates.sort();
+    var howManyDates = availableDates.length;
+    for (var d = 0; d < howManyDates; d++) {
+        dateOptions = dateOptions + '<option value="' + availableDates[d] + '">Report date: '+availableDates[d]+'</option>';
+    }
+    $('#hc-reports #selReports').html(dateOptions);
+    $('#hc-reports .input-report').remove();
 }
 
 function appendToStorage(name, data){
@@ -108,14 +129,26 @@ window.setInterval(function(){
 
 
 $(document).ready(function() {
-    $('body').append('<div id="hc-reports"><input type="text" class="input-report" placeholder="11-23"><input type="button" class="button-get" value="Show report data"><div class="data"></div></div><div id="close-reports">X</div><div id="open-reports"></div>');
+    $('body').append('<div id="hc-reports"><select id="selReports"></select><input type="text" class="input-report" placeholder="11-23"><input type="button" class="button-get" value="Show report data"><input type="button" class="button-delete" value="Delete report data"><div class="data"></div></div><div id="close-reports">X</div><div id="open-reports"></div>');
     getCoverage();
 });
 
+$('body').on('click', '#hc-reports .button-delete', function() {
+    var reportdate = $('#selReports').val();
+    var txt;
+    var delReport = confirm("This will remove the report for "+reportdate+".");
+    if (delReport == true) {
+        localStorage.removeItem("report-"+reportdate);
+        alert("Report for "+ reportdate +" has been deleted.");
+        var elementToRemove = 'option[value='+reportdate+']';
+        $(elementToRemove).remove();
+    }
+});
+
 $('body').on('click', '#hc-reports .button-get', function() {
-    var reportdate = $('.input-report').val();
+    var reportdate = $('#selReports').val();
     var theData = localStorage.getItem("report-"+reportdate);
-    var reports = '<table>'+theData+'</tr></table>';
+    var reports = '<div class="line-100 line-hor"></div><div class="y-100">100</div><div class="line-75 line-hor"></div><div class="y-75">75</div><div class="line-50 line-hor"></div><div class="y-50">50</div><div class="line-25 line-hor"></div><div class="y-25">25</div><table>'+theData+'</tr></table>';
     $('.data').html(reports);
     var minutes = $('body.reports .data table td').length;
     $('body.reports .data table').css('width',minutes+'px');
@@ -126,6 +159,8 @@ $('body').on('click', '#hc-reports .button-get', function() {
     $('.morechat').addClass('morechat-hide');
     $('input[type="checkbox"]').prop('checked', true);
     $('input#morechats').prop('checked', false);
+    var tableWidth = $('#hc-reports table').width();
+    $('#hc-reports .data .line-hor').css('width',(tableWidth)+'px');
 });
 
 $(document).on('change', '#avail-slots', function() {
@@ -153,6 +188,7 @@ $('body').on('click', '.zoom-in', function() {
     var newWidth = currentSetting+1;
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells*newWidth)+'px');
+    $('#hc-reports .data .line-hor').css('width',(cells*newWidth)+'px');
     $('#hc-reports .data table td, #hc-reports .data table td .av, #hc-reports .data table .cc, #hc-reports .data table td img').css('width',newWidth+'px');
 });
 
@@ -164,12 +200,14 @@ $('body').on('click', '.zoom-out', function() {
     }
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells*newWidth)+'px');
+    $('#hc-reports .data .line-hor').css('width',(cells*newWidth)+'px');
     $('#hc-reports .data table td, #hc-reports .data table td .av, #hc-reports .data table .cc, #hc-reports .data table td img').css('width',newWidth+'px');
 });
 
 $('body').on('click', '.zoom-reset', function() {
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells)+'px');
+    $('#hc-reports .data .line-hor').css('width',(cells)+'px');
     $('#hc-reports .data table td, #hc-reports .data table td .av, #hc-reports .data table .cc, #hc-reports .data table td img').css('width','1px');
 });
 
