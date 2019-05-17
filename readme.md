@@ -43,8 +43,6 @@ For example, 13:19 44/50 (3/12) means:
 Here’s some things that are currently not working, or that I will need to fix before it’s ready for prime time:
 
 - read/write all the data in JSON format so it can be easily converted to other formats (CSV, etc.)
-- add indicators in graph (time on horizontal axis, numbers on vertical axis)
+- add time indicators in graph (horizontal axis)
 - add gaps where there’s no data (right now, if you would close your browser tab or the connection gets lost and it wouldn’t collect data, it will not add zeros while the time keeps running -- it will just not do anything at all, so it’s possible you’ll see jumps from 11:45 to 12:15, without seeing blank data for that time)
-- make the date selector show for which dates reports are available
-- ability to remove reports from certain dates
 - save data to a file (this is probably the most important one, but also the trickiest)
