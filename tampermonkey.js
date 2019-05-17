@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Happychat Coverage & Reports
 // @namespace    http://tampermonkey.net/
-// @version      0.91
+// @version      0.95
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
@@ -123,6 +123,55 @@ function appendToStorage(name, data){
     localStorage.setItem(name, old + data);
 }
 
+function fillInTheBlanks() {
+
+	var prevHour = 0;
+
+	for (var hh = 0; hh < 24; hh++) {
+
+		if(hh<10) {
+			hh='0'+hh;
+		}
+
+		var prevMin = 0;
+
+		for (var mm = 0; mm < 60; mm++) {
+
+			prevMin = mm-1;
+			prevHour = hh;
+
+			if(mm==0) {
+				prevMin = 59;
+				prevHour = hh-1;
+				if(prevHour<10) {
+					prevHour='0'+prevHour;
+				}
+			}
+
+			if(prevMin<10) {
+				prevMin='0'+prevMin;
+			}
+
+			if(mm<10) {
+				mm='0'+mm;
+			}
+
+			if($('.hour-'+hh+'.min-'+mm).length < 1) {
+				if((mm=='00')&&(hh=='00')) {
+					$('#hc-reports .data table.reporting tr').prepend('<td class="hour-00 min-00 no-data"><div class="av" style="width: 1px;"><img class="a" style="background: #ffffff; height: 500px; width: 1px;" src="http://senff.com/x.png" title="00:00 - no data available"></div></td>');
+				} else {
+					$('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin).after('<td class="hour-'+hh+' min-'+mm+' no-data"><div class="av" style="width: 1px;"><img class="a" style="background: #ffffff; height: 500px; width: 1px;" src="http://senff.com/x.png" title="'+hh+':'+mm+' - no data available"></div></td>');
+				}
+			}
+		}
+    }
+
+    $('#hc-reports .data table.reporting').addClass('filled');
+    $('#hc-reports .data table.reporting').after('<div class="timeline"></div>');
+    $('#hc-reports .data table.reporting').css('width','1440px');
+    $('#hc-reports .data .timeline').css('width','1440px');
+}
+
 window.setInterval(function(){
     getCoverage();
 }, 60000);
@@ -151,10 +200,9 @@ $('body').on('click', '#hc-reports .button-get', function() {
     var reportdate = $('#selReports').val();
     if(reportdate != "date") {
         var theData = localStorage.getItem("report-"+reportdate);
-        var reports = '<div class="line-100 line-hor"></div><div class="y-100">100</div><div class="line-75 line-hor"></div><div class="y-75">75</div><div class="line-50 line-hor"></div><div class="y-50">50</div><div class="line-25 line-hor"></div><div class="y-25">25</div><table class="report-'+reportdate+'">'+theData+'</tr></table>';
+        var reports = '<div class="y-axis"><div class="line-100 line-hor"></div><div class="y-100">100</div><div class="line-75 line-hor"></div><div class="y-75">75</div><div class="line-50 line-hor"></div><div class="y-50">50</div><div class="line-25 line-hor"></div><div class="y-25">25</div></div><table class="reporting report-'+reportdate+'">'+theData+'</tr></table>';
         $('.data').html(reports);
         var minutes = $('body.reports .data table td').length;
-        $('body.reports .data table').css('width',minutes+'px');
         if($('.checkboxes').length < 1) {
             $('#hc-reports').append('<div class="checkboxes"><input type="checkbox" id="avail-slots" name="avail-slots" checked><label for="avail-slots">Available slots (total throttle)</label><input type="checkbox" id="filled-slots" name="filled-slots" checked><label for="filled-slots">Current chats</label><input type="checkbox" id="sh-green" name="sh-green" checked><label for="sh-green">Chats/slots of green HEs</label><input type="checkbox" id="sh-blue" name="sh-blue" checked><label for="sh-blue">Chats/slots of blue HEs</label><input type="checkbox" id="morechats" name="morechats"><label for="morechats">Highlight morechat (all green/blue HEs are filled up)</label></div>');
             $('#hc-reports').append('<div class="zooms"><a href="#" class="zoom-in">Zoom in</a> <a href="#" class="zoom-out">Zoom out</a> <a href="#" class="zoom-reset">Reset</a></div>');
@@ -162,8 +210,7 @@ $('body').on('click', '#hc-reports .button-get', function() {
         $('.morechat').addClass('morechat-hide');
         $('input[type="checkbox"]').prop('checked', true);
         $('input#morechats').prop('checked', false);
-        var tableWidth = $('#hc-reports table').width();
-        $('#hc-reports .data .line-hor').css('width',(tableWidth)+'px');
+        fillInTheBlanks();
     }
 });
 
@@ -189,11 +236,13 @@ $(document).on('change', '#morechats', function() {
 
 $('body').on('click', '.zoom-in', function() {
     var currentSetting = $('#hc-reports .data table td:first-child img.a').width();
+    console.log('Current: '+currentSetting);
     var newWidth = currentSetting+1;
+    console.log('New: '+newWidth);
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells*newWidth)+'px');
-    $('#hc-reports .data .line-hor').css('width',(cells*newWidth)+'px');
-    $('#hc-reports .data table td, #hc-reports .data table td .av, #hc-reports .data table .cc, #hc-reports .data table td img').css('width',newWidth+'px');
+    $('#hc-reports .data table.reporting td, #hc-reports .data table.reporting td .av, #hc-reports .data table.reporting .cc, #hc-reports .data table.reporting td img').css('width',newWidth+'px');
+    $('#hc-reports .data .timeline').css('width',(cells*newWidth)+'px');
 });
 
 $('body').on('click', '.zoom-out', function() {
@@ -204,15 +253,15 @@ $('body').on('click', '.zoom-out', function() {
     }
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells*newWidth)+'px');
-    $('#hc-reports .data .line-hor').css('width',(cells*newWidth)+'px');
-    $('#hc-reports .data table td, #hc-reports .data table td .av, #hc-reports .data table .cc, #hc-reports .data table td img').css('width',newWidth+'px');
+    $('#hc-reports .data table.reporting td, #hc-reports .data table.reporting td .av, #hc-reports .data table.reporting .cc, #hc-reports .data table.reporting td img').css('width',newWidth+'px');
+    $('#hc-reports .data .timeline').css('width',(cells*newWidth)+'px');
 });
 
 $('body').on('click', '.zoom-reset', function() {
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells)+'px');
-    $('#hc-reports .data .line-hor').css('width',(cells)+'px');
-    $('#hc-reports .data table td, #hc-reports .data table td .av, #hc-reports .data table .cc, #hc-reports .data table td img').css('width','1px');
+    $('#hc-reports .data table.reporting td, #hc-reports .data table.reporting td .av, #hc-reports .data table.reporting .cc, #hc-reports .data table.reporting td img').css('width','1px');
+    $('#hc-reports .data .timeline').css('width',(cells)+'px');
 });
 
 $('body').on('click', '#open-reports', function() {
