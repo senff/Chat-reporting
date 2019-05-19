@@ -53,7 +53,7 @@
     margin-left: 30px;
     background: #dd0000;
     background:url('http://senff.com/happychat/timeline-numbers.png');
-    background-size: 100% auto;
+    background-size: 100% 100%;
     background-position: left center;
     background-repeat: no-repeat;
 }
@@ -118,6 +118,10 @@
 
 #hc-reports .data .y-25 {
     top: 415px;    
+}
+
+#hc-reports .data table td.interpolated img {
+    opacity: 0.7;
 }
 
 #hc-reports .data table td.min-59:after {
