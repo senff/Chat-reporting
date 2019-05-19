@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Happychat Coverage & Reports
 // @namespace    http://tampermonkey.net/
-// @version      0.95
+// @version      1.0
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
@@ -126,6 +126,7 @@ function appendToStorage(name, data){
 function fillInTheBlanks() {
 
 	var prevHour = 0;
+	var nextHour = 0;
 
 	for (var hh = 0; hh < 24; hh++) {
 
@@ -134,11 +135,14 @@ function fillInTheBlanks() {
 		}
 
 		var prevMin = 0;
+		var nextMin = 0;
 
 		for (var mm = 0; mm < 60; mm++) {
 
 			prevMin = mm-1;
+			nextMin = mm+1;
 			prevHour = hh;
+			nextHour = hh;
 
 			if(mm==0) {
 				prevMin = 59;
@@ -148,22 +152,60 @@ function fillInTheBlanks() {
 				}
 			}
 
+			if(nextMin==60) {
+				nextHour = hh+1;
+				if(nextHour<10) {
+					nextHour='0'+nextHour;
+				}
+				nextMin = 0;
+			}
+
 			if(prevMin<10) {
 				prevMin='0'+prevMin;
+			}
+
+			if(nextMin<10) {
+				nextMin='0'+nextMin;
 			}
 
 			if(mm<10) {
 				mm='0'+mm;
 			}
 
-			if($('.hour-'+hh+'.min-'+mm).length < 1) {
+            if($('.hour-'+hh+'.min-'+mm).length < 1) {
 				if((mm=='00')&&(hh=='00')) {
 					$('#hc-reports .data table.reporting tr').prepend('<td class="hour-00 min-00 no-data"><div class="av" style="width: 1px;"><img class="a" style="background: #ffffff; height: 500px; width: 1px;" src="http://senff.com/x.png" title="00:00 - no data available"></div></td>');
+				} else if ( ($('.hour-'+prevHour+'.min-'+prevMin).length) && ($('.hour-'+nextHour+'.min-'+nextMin).length) && (!$('.hour-'+prevHour+'.min-'+prevMin).hasClass('no-data')) ) {
+					// Interpolate if previous and next do exist
+
+                    var pblueOpen = $('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin+' img.a:first-child').height();
+                    var pgreenOpen = $('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin+' img.a:last-child').height();
+                    var pblueChat = $('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin+' img.c:first-child').height();
+                    var pgreenChat = $('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin+' img.c:last-child').height();
+
+                    var nblueOpen = $('#hc-reports .data table.reporting td.hour-'+nextHour+'.min-'+nextMin+' img.a:first-child').height();
+                    var ngreenOpen = $('#hc-reports .data table.reporting td.hour-'+nextHour+'.min-'+nextMin+' img.a:last-child').height();
+                    var nblueChat = $('#hc-reports .data table.reporting td.hour-'+nextHour+'.min-'+nextMin+' img.c:first-child').height();
+                    var ngreenChat = $('#hc-reports .data table.reporting td.hour-'+nextHour+'.min-'+nextMin+' img.c:last-child').height();
+
+                    var thisBlueOpen = (pblueOpen + nblueOpen) / 10;
+                    var thisGreenOpen = (pgreenOpen + ngreenOpen) / 10;
+                    var thisBlueChat = (pblueChat + nblueChat) / 10;
+                    var thisGreenChat = (pgreenChat + ngreenChat) / 10;
+                    var mcClass = '';
+
+                    if ((thisGreenChat + thisBlueChat) >= (thisGreenOpen + thisBlueOpen)) {
+                        mcClass = "morechat";
+                    }
+
+					$('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin).after('<td class="hour-'+hh+' min-'+mm+' no-data interpolated"><div class="av"><img class="a" style="height:'+(thisBlueOpen*5)+'px;" src="http://senff.com/x.png" title="'+hh+':'+mm+' - '+thisGreenChat+'/'+thisGreenOpen+' ('+thisBlueChat+'/'+thisBlueOpen+') -- INTERPOLATED"><img class="a" style="height:'+(thisGreenOpen*5)+'px;" src="http://senff.com/x.png" title="'+hh+':'+mm+' - '+thisGreenChat+'/'+thisGreenOpen+' ('+thisBlueChat+'/'+thisBlueOpen+') -- INTERPOLATED"></div><div class="cc '+mcClass+'"><img class="c '+mcClass+'" style="height: '+(thisBlueChat*5)+'px;" src="http://senff.com/x.png" title="'+hh+':'+mm+' - '+thisGreenChat+'/'+thisGreenOpen+' ('+thisBlueChat+'/'+thisBlueOpen+') -- INTERPOLATED"><img class="c '+mcClass+'" style="height: '+(thisGreenChat*5)+'px;" src="http://senff.com/x.png" title="'+hh+':'+mm+' - '+thisGreenChat+'/'+thisGreenOpen+' ('+thisBlueChat+'/'+thisBlueOpen+') -- INTERPOLATED"></div></td>');
 				} else {
+					// No data
 					$('#hc-reports .data table.reporting td.hour-'+prevHour+'.min-'+prevMin).after('<td class="hour-'+hh+' min-'+mm+' no-data"><div class="av" style="width: 1px;"><img class="a" style="background: #ffffff; height: 500px; width: 1px;" src="http://senff.com/x.png" title="'+hh+':'+mm+' - no data available"></div></td>');
 				}
 			}
-		}
+
+        }
     }
 
     $('#hc-reports .data table.reporting').addClass('filled');
@@ -171,6 +213,9 @@ function fillInTheBlanks() {
     $('#hc-reports .data table.reporting').css('width','1440px');
     $('#hc-reports .data .timeline').css('width','1440px');
 }
+
+
+
 
 window.setInterval(function(){
     getCoverage();
@@ -236,9 +281,7 @@ $(document).on('change', '#morechats', function() {
 
 $('body').on('click', '.zoom-in', function() {
     var currentSetting = $('#hc-reports .data table td:first-child img.a').width();
-    console.log('Current: '+currentSetting);
     var newWidth = currentSetting+1;
-    console.log('New: '+newWidth);
     var cells = $('#hc-reports table td').length;
     $('#hc-reports .data table').css('width',(cells*newWidth)+'px');
     $('#hc-reports .data table.reporting td, #hc-reports .data table.reporting td .av, #hc-reports .data table.reporting .cc, #hc-reports .data table.reporting td img').css('width',newWidth+'px');
