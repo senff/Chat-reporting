@@ -5,6 +5,7 @@
 // @description  Coverage logger for Happychat
 // @author       Senff
 // @require      https://code.jquery.com/jquery-1.12.4.js
+// @updateURL    https://github.com/senff/Chat-reporting/raw/master/chat-reporting.user.js
 // @match        https://hud.happychat.io/*
 // @grant        none
 // ==/UserScript==
